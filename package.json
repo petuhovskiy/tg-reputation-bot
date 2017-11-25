@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/petuhovskiy/tg-reputation-bot/issues"
   },
-  "homepage": "https://github.com/petuhovskiy/tg-reputation-bot#readme"
+  "homepage": "https://github.com/petuhovskiy/tg-reputation-bot#readme",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "node-telegram-bot-api": "^0.29.0"
+  }
 }
