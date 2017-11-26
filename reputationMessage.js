@@ -7,9 +7,15 @@ const getForChange = (change) => {
 }
 
 module.exports = bot => msg => {
+    if (msg.limit == 3) {
+        bot.sendMessage(msg.chatId, utils.trimMessage(
+            `Вы не можете менять свою репутацию!`
+        ))
+        return;
+    }
     if (msg.limit) {
         bot.sendMessage(msg.chatId, utils.trimMessage(
-            `Вы уже меняли репутацию 3 раза сегодня!`
+            `Вы превысили лимит на сегодня!`
         ))
         return;
     }

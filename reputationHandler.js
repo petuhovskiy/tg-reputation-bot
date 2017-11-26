@@ -14,7 +14,6 @@ const parseUsername = u => {
 module.exports = bot => {
 
     const f = (msg, username) => {
-        console.log(msg);
         return process(msg.chat.id, msg.from, parseUsername(username));
     }
 
@@ -23,7 +22,7 @@ module.exports = bot => {
     bot.onText(/\+rep (.+)/, (msg, match) => f(msg, match[1]).plus().then(resp, resp));
     bot.onText(/-rep (.+)/, (msg, match) => f(msg, match[1]).minus().then(resp, resp));
     bot.onText(/\?rep (.+)/, (msg, match) => f(msg, match[1]).get().then(resp, resp));
-    bot.onText(/\?rep/, msg => {
+    bot.onText(/\?rep$/, msg => {
         if (!msg.from.username) {
             bot.sendMessage("Вам нужно поставить username для того чтобы узнавать свою репутацию!");
             return;
