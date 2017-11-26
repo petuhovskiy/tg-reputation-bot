@@ -1,18 +1,33 @@
 const reputation = require('./reputation')
 
-const process = (chatId, fromId, username, callback) => ({
-    plus: () => reputation.plus(chatId, fromId, username, callback),
-    minus: () => reputation.minus(chatId, fromId, username, callback),
-    get: () => reputation.get(chatId, username, callback)
+const process = (chatId, from, username) => ({
+    plus: () => reputation.plus(chatId, from, username),
+    minus: () => reputation.minus(chatId, from, username),
+    get: () => reputation.get(chatId, username)
 })
+
+const parseUsername = u => {
+    if (u.indexOf('@') == 0) return u.substring(1);
+    return u;
+}
 
 module.exports = bot => {
 
-    const f = (msg, match) => {
-        return process(msg.chat.id, msg.from.id, match[1], bot.reputationMessage);
+    const f = (msg, username) => {
+        console.log(msg);
+        return process(msg.chat.id, msg.from, parseUsername(username));
     }
 
-    bot.onText(/\+rep (.+)/, (msg, match) => f(msg, match).plus());
-    bot.onText(/-rep (.+)/, (msg, match) => f(msg, match).minus());
-    bot.onText(/\?rep (.+)/, (msg, match) => f(msg, match).get());
+    const resp = bot.reputationMessage;
+
+    bot.onText(/\+rep (.+)/, (msg, match) => f(msg, match[1]).plus().then(resp, resp));
+    bot.onText(/-rep (.+)/, (msg, match) => f(msg, match[1]).minus().then(resp, resp));
+    bot.onText(/\?rep (.+)/, (msg, match) => f(msg, match[1]).get().then(resp, resp));
+    bot.onText(/\?rep/, msg => {
+        if (!msg.from.username) {
+            bot.sendMessage("Вам нужно поставить username для того чтобы узнавать свою репутацию!");
+            return;
+        }
+        return f(msg, msg.from.username).get().then(resp, resp);
+    });
 }

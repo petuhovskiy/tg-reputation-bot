@@ -1,9 +1,9 @@
 const utils = require('./utils')
 
 const getForChange = (change) => {
-    if (change == 0) return ""
     if (change > 0) return " увеличена!"
     if (change < 0) return " уменьшена!"
+    return ""
 }
 
 module.exports = bot => msg => {
@@ -14,10 +14,12 @@ module.exports = bot => msg => {
         return;
     }
     bot.sendMessage(msg.chatId, utils.trimMessage(
-        `Репутация @${msg.reputation.username}${getForChange(msg.reputation.change)}.
-        Текущая репутация: **${msg.reputation.value}**
+        `Репутация @${msg.reputation.username}${getForChange(msg.reputation.change)}
+        Текущая репутация: *${msg.reputation.value}*
         
-        +${msg.reputation.plus}/-${msg.reputation.minus}
+        _+${msg.reputation.plus} / -${msg.reputation.minus}_
         `
-    ))
+    ), {
+        parse_mode: "Markdown"
+    });
 }
