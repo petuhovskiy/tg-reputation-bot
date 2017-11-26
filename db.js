@@ -4,7 +4,6 @@ const Schema = mongoose.Schema
 // init
 
 const url = process.env.MONGO_DB;
-console.log(url);
 mongoose.connect(url);
 
 const db = mongoose.connection;

@@ -21,11 +21,11 @@ module.exports = bot => msg => {
     }
     bot.sendMessage(msg.chatId, utils.trimMessage(
         `Репутация @${msg.reputation.username}${getForChange(msg.reputation.change)}
-        Текущая репутация: *${msg.reputation.value}*
+        Текущая репутация: <b>${msg.reputation.value}</b>
         
-        _+${msg.reputation.plus} / -${msg.reputation.minus}_
+        <i>+${msg.reputation.plus} / -${msg.reputation.minus}</i>
         `
     ), {
-        parse_mode: "Markdown"
+        parse_mode: "HTML"
     });
 }
