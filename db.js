@@ -28,7 +28,8 @@ const reputationChangeSchema = new Schema({
     id: Number,
     chatId: Number,
     username: String,
-    value: Number
+    value: Number,
+    time: Number
 })
 
 reputationChangeSchema.statics.countReputationByValue = function(chatId, username, value) {
@@ -49,7 +50,7 @@ reputationChangeSchema.statics.getStats = function(chatId, plus, minus, sort) {
             // Stage 1
             {
                 $match: {
-                    chatId: -22628215
+                    chatId
                 }
             },
     
@@ -72,8 +73,13 @@ reputationChangeSchema.statics.getStats = function(chatId, plus, minus, sort) {
     ).exec();
 }
 
-reputationChangeSchema.statics.findByUsers = function(chatId, id, username) {
-    return this.findOne({ chatId, id, username }).exec();
+reputationChangeSchema.statics.findByUsers = function(chatId, id, username, value) {
+    return this
+        .find({ chatId, id, username, value })
+        .sort({ time: -1 })
+        .limit(1)
+        .exec()
+        .then(arr => arr[0]);
 }
 
 const ReputationChange = mongoose.model('ReputationChange', reputationChangeSchema);

@@ -1,8 +1,9 @@
+const utils = require('./utils')
 const db = require('./db')
 const Activity = db.Activity;
 const ReputationChange = db.ReputationChange;
 
-const getDate = d => new Date(d).toDateString();
+const { getDate, isEqualDays } = utils
 
 async function getTodayActivity(chatId, id) {
     const now = Date.now();
@@ -27,8 +28,8 @@ async function getTodayActivity(chatId, id) {
     return activity;
 }
 
-const PLUS = 10;
-const MINUS = 15;
+const PLUS = 1;
+const MINUS = 1;
 
 async function getReputation(chatId, user, change) {
     const {username} = user;
@@ -59,14 +60,14 @@ const MINUS_LIMIT = parseInt(process.env.MINUS_LIMIT || '1')
 
 async function setReputation(from, chatId, user, value) {
     const {username} = user;
-    if (from.username.toLowerCase() == username) {
+    const fromUsername = (from.username ? from.username.toLowerCase() : null);
+    if (fromUsername == username) {
         throw {chatId, limit: 3};
     }
 
     const checkActivity = act => {
-        if (act.plus > PLUS_LIMIT) throw {chatId, limit: 1};
-        if (act.minus > MINUS_LIMIT) throw {chatId, limit: 2};
-        act.save();
+        if (act.plus > PLUS_LIMIT) throw {chatId, limit: 2};
+        if (act.minus > MINUS_LIMIT) throw {chatId, limit: 1};
     }
 
     const activity = await getTodayActivity(chatId, from.id);
@@ -74,31 +75,34 @@ async function setReputation(from, chatId, user, value) {
         activity.plus += 1;
     } else if (value == -1) {
         activity.minus += 1;
+        const err = {chatId, limit: 5};
+        if (!fromUsername) throw err;
+        const rep = await getReputation(chatId, {
+            username: fromUsername,
+            query: from.username,
+            display: '@' + from.username
+        });
+        if (rep.reputation.value < 5) throw err;
     }
 
-    let rep = await ReputationChange.findByUsers(chatId, from.id, username);
-    if (rep == null) {
+    const now = Date.now();
+
+    let rep = await ReputationChange.findByUsers(chatId, from.id, username, value);
+    if (rep == null || !isEqualDays(rep.time, now)) {
         checkActivity(activity);
+        await activity.save();
         rep = new ReputationChange({
             chatId,
             id: from.id,
             username,
-            value
+            value,
+            time: now
         });
         await rep.save();
         return value;
     }
 
-    if (value == rep.value) {
-        return 0;
-    }
-
-    checkActivity(activity);
-
-    const result = value - rep.value;
-    rep.value = value;
-    await rep.save();
-    return result;
+    throw {chatId, limit: 4}
 }
 
 module.exports = {
