@@ -42,6 +42,36 @@ reputationChangeSchema.statics.countReputation = async function(chatId, username
     }
 }
 
+reputationChangeSchema.statics.getStats = function(chatId, plus, minus, sort) {
+    return this.aggregate(
+        // Pipeline
+        [
+            // Stage 1
+            {
+                $match: {
+                    chatId: -22628215
+                }
+            },
+    
+            // Stage 2
+            {
+                $group: {
+                    _id: { username: "$username" },
+                    value: { $sum: { $sum: [(plus - minus) / 2.0, {$multiply: ["$value", (plus + minus) / 2.0] }] } }
+                }
+            },
+    
+            // Stage 3
+            {
+                $sort: {
+                    value: sort
+                }
+            },
+        ]
+        // Created with Studio 3T, the IDE for MongoDB - https://studio3t.com/
+    ).exec();
+}
+
 reputationChangeSchema.statics.findByUsers = function(chatId, id, username) {
     return this.findOne({ chatId, id, username }).exec();
 }

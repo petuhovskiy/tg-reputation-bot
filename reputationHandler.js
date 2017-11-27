@@ -33,4 +33,5 @@ module.exports = bot => {
         }
         return f(msg, msg.from.username).get().then(resp, resp);
     });
+    bot.onText(/\/repstats[@ ]?.*/, msg => reputation.showStats(msg.chat.id).then(resp, resp));
 }

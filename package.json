@@ -20,6 +20,7 @@
     "dotenv": "^4.0.0",
     "mongodb": "^2.2.33",
     "mongoose": "^4.13.5",
-    "node-telegram-bot-api": "^0.29.0"
+    "node-telegram-bot-api": "^0.29.0",
+    "splice-string": "^2.0.0"
   }
 }

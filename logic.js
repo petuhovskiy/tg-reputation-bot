@@ -27,6 +27,9 @@ async function getTodayActivity(chatId, id) {
     return activity;
 }
 
+const PLUS = 10;
+const MINUS = 15;
+
 async function getReputation(chatId, user, change) {
     const {username} = user;
     const rep = await ReputationChange.countReputation(chatId, username);
@@ -35,11 +38,20 @@ async function getReputation(chatId, user, change) {
         reputation: {
             user,
             change,
-            value: rep.plus * 10 - rep.minus * 15,
+            value: rep.plus * PLUS - rep.minus * MINUS,
             plus: rep.plus,
             minus: rep.minus
         }
     };
+}
+
+async function getStats(chatId) {
+    const result = await db.ReputationChange.getStats(chatId, PLUS, MINUS, -1);
+    return {
+        chatId,
+        type: 'stats',
+        result
+    }
 }
 
 const PLUS_LIMIT = parseInt(process.env.PLUS_LIMIT || '3')
@@ -91,5 +103,6 @@ async function setReputation(from, chatId, user, value) {
 
 module.exports = {
     getReputation,
-    setReputation
+    setReputation,
+    getStats
 }

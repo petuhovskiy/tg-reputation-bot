@@ -20,8 +20,13 @@ const get = (chatId, username) => {
     return queue.add(() => logic.getReputation(chatId, username));
 }
 
+const showStats = (chatId) => {
+    return queue.add(() => logic.getStats(chatId));
+}
+
 module.exports = {
     plus,
     minus,
-    get
+    get,
+    showStats
 }
