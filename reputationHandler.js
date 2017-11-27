@@ -7,8 +7,12 @@ const process = (chatId, from, username) => ({
 })
 
 const parseUsername = u => {
-    if (u.indexOf('@') == 0) return u.substring(1);
-    return u;
+    let username = (u.indexOf('@') == 0) ? u.substring(1) : u;
+    return {
+        username: username.toLowerCase(),
+        query: username,
+        display: '@' + username
+    }
 }
 
 module.exports = bot => {

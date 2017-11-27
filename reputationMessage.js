@@ -20,7 +20,7 @@ module.exports = bot => msg => {
         return;
     }
     bot.sendMessage(msg.chatId, utils.trimMessage(
-        `Репутация @${msg.reputation.username}${getForChange(msg.reputation.change)}
+        `Репутация ${msg.reputation.user.display}${getForChange(msg.reputation.change)}
         Текущая репутация: <b>${msg.reputation.value}</b>
         
         <i>+${msg.reputation.plus} / -${msg.reputation.minus}</i>

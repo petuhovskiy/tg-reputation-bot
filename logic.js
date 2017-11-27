@@ -4,12 +4,13 @@ const ReputationChange = db.ReputationChange;
 
 const getDate = d => new Date(d).toDateString();
 
-async function getTodayActivity(id) {
+async function getTodayActivity(chatId, id) {
     const now = Date.now();
-    let activity = await Activity.findByUserId(id);
+    let activity = await Activity.findByUserId(chatId, id);
     if (!activity) {
         activity = new Activity({
-            id: id,
+            id,
+            chatId,
             minus: 0,
             plus: 0,
             last: now
@@ -26,12 +27,13 @@ async function getTodayActivity(id) {
     return activity;
 }
 
-async function getReputation(chatId, username, change) {
-    const rep = await ReputationChange.countReputation(username);
+async function getReputation(chatId, user, change) {
+    const {username} = user;
+    const rep = await ReputationChange.countReputation(chatId, username);
     return {
         chatId,
         reputation: {
-            username,
+            user,
             change,
             value: rep.plus * 10 - rep.minus * 15,
             plus: rep.plus,
@@ -40,8 +42,9 @@ async function getReputation(chatId, username, change) {
     };
 }
 
-async function setReputation(from, chatId, username, value) {
-    if (from.username == username) {
+async function setReputation(from, chatId, user, value) {
+    const {username} = user;
+    if (from.username.toLowerCase() == username) {
         throw {chatId, limit: 3};
     }
 
@@ -51,17 +54,18 @@ async function setReputation(from, chatId, username, value) {
         act.save();
     }
 
-    const activity = await getTodayActivity(from.id);
+    const activity = await getTodayActivity(chatId, from.id);
     if (value == 1) {
         activity.plus += 1;
     } else if (value == -1) {
         activity.minus += 1;
     }
 
-    let rep = await ReputationChange.findByUsers(from.id, username);
+    let rep = await ReputationChange.findByUsers(chatId, from.id, username);
     if (rep == null) {
         checkActivity(activity);
         rep = new ReputationChange({
+            chatId,
             id: from.id,
             username,
             value
