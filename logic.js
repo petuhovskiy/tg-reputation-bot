@@ -42,6 +42,9 @@ async function getReputation(chatId, user, change) {
     };
 }
 
+const PLUS_LIMIT = parseInt(process.env.PLUS_LIMIT || '3')
+const MINUS_LIMIT = parseInt(process.env.MINUS_LIMIT || '1')
+
 async function setReputation(from, chatId, user, value) {
     const {username} = user;
     if (from.username.toLowerCase() == username) {
@@ -49,8 +52,8 @@ async function setReputation(from, chatId, user, value) {
     }
 
     const checkActivity = act => {
-        if (act.plus > 3) throw {chatId, limit: 1};
-        if (act.minus > 1) throw {chatId, limit: 2};
+        if (act.plus > PLUS_LIMIT) throw {chatId, limit: 1};
+        if (act.minus > MINUS_LIMIT) throw {chatId, limit: 2};
         act.save();
     }
 
