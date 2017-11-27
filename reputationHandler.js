@@ -23,9 +23,9 @@ module.exports = bot => {
 
     const resp = bot.reputationMessage;
 
-    bot.onText(/\+rep (\w+)/, (msg, match) => f(msg, match[1]).plus().then(resp, resp));
-    bot.onText(/-rep (\w+)/, (msg, match) => f(msg, match[1]).minus().then(resp, resp));
-    bot.onText(/\?rep (\w+)/, (msg, match) => f(msg, match[1]).get().then(resp, resp));
+    bot.onText(/\+rep ([@\w]+)/, (msg, match) => f(msg, match[1]).plus().then(resp, resp));
+    bot.onText(/-rep ([@\w]+)/, (msg, match) => f(msg, match[1]).minus().then(resp, resp));
+    bot.onText(/\?rep ([@\w]+)/, (msg, match) => f(msg, match[1]).get().then(resp, resp));
     bot.onText(/\?rep$/, msg => {
         if (!msg.from.username) {
             bot.sendMessage("Вам нужно <b>поставить username</b> для того чтобы узнавать свою репутацию ⛔️!", {parse_mode: "HTML"});
