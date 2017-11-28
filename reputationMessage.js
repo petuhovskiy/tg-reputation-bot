@@ -72,6 +72,13 @@ module.exports = bot => msg => {
         )
         return;
     }
+    if (msg.limit == 6) {
+        bot.sendMessage(msg.chatId,
+            'Некорректный username!',
+            {parse_mode: "HTML"}
+        );
+        return;
+    }
     if (msg.type == 'stats') {
         bot.sendMessage(msg.chatId, getStatsMessage(msg.result), {parse_mode: "HTML"});
         return;

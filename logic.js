@@ -71,6 +71,9 @@ const MINUS_LIMIT = parseInt(process.env.MINUS_LIMIT || '1')
 
 async function setReputation(from, chatId, user, value) {
     const {username} = user;
+    if (username.length == 0) {
+        throw {chatId, limit: 6};
+    }
     const fromUsername = (from.username ? from.username.toLowerCase() : null);
     if (fromUsername == username) {
         throw {chatId, limit: 3};
