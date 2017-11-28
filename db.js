@@ -32,47 +32,6 @@ const reputationChangeSchema = new Schema({
     time: Number
 })
 
-reputationChangeSchema.statics.countReputationByValue = function(chatId, username, value) {
-    return this.count({ chatId, username, value }).exec();
-}
-
-reputationChangeSchema.statics.countReputation = async function(chatId, username) {
-    return {
-        plus: await this.countReputationByValue(chatId, username, 1),
-        minus: await this.countReputationByValue(chatId, username, -1)
-    }
-}
-
-reputationChangeSchema.statics.getStats = function(chatId, plus, minus, sort) {
-    return this.aggregate(
-        // Pipeline
-        [
-            // Stage 1
-            {
-                $match: {
-                    chatId
-                }
-            },
-    
-            // Stage 2
-            {
-                $group: {
-                    _id: { username: "$username" },
-                    value: { $sum: { $sum: [(plus - minus) / 2.0, {$multiply: ["$value", (plus + minus) / 2.0] }] } }
-                }
-            },
-    
-            // Stage 3
-            {
-                $sort: {
-                    value: sort
-                }
-            },
-        ]
-        // Created with Studio 3T, the IDE for MongoDB - https://studio3t.com/
-    ).exec();
-}
-
 reputationChangeSchema.statics.findByUsers = function(chatId, id, username, value) {
     return this
         .find({ chatId, id, username, value })
@@ -82,9 +41,36 @@ reputationChangeSchema.statics.findByUsers = function(chatId, id, username, valu
         .then(arr => arr[0]);
 }
 
+reputationChangeSchema.statics.findAll = function() {
+    return this.find({}).exec();
+}
+
 const ReputationChange = mongoose.model('ReputationChange', reputationChangeSchema);
+
+const reputationSchema = new Schema({
+    chatId: Number,
+    username: String,
+    value: Number,
+    plus: Number,
+    minus: Number
+})
+
+reputationSchema.statics.countReputation = async function(chatId, username) {
+    return this.findOne({ chatId, username }).exec();
+}
+
+reputationSchema.statics.getStats = function(chatId, sort) {
+    return this.find({ chatId }).sort({ value: sort }).exec();
+}
+
+reputationSchema.statics.findAll = function() {
+    return this.find({}).exec();
+}
+
+const Reputation = mongoose.model('Reputation', reputationSchema);
 
 module.exports = {
     Activity,
-    ReputationChange
+    ReputationChange,
+    Reputation
 }

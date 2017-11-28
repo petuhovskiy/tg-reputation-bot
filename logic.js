@@ -1,8 +1,7 @@
 const utils = require('./utils')
 const db = require('./db')
-const Activity = db.Activity;
-const ReputationChange = db.ReputationChange;
 
+const { Activity, ReputationChange, Reputation } = db;
 const { getDate, isEqualDays } = utils
 
 async function getTodayActivity(chatId, id) {
@@ -33,7 +32,7 @@ const MINUS = 1;
 
 async function getReputation(chatId, user, change) {
     const {username} = user;
-    const rep = await ReputationChange.countReputation(chatId, username);
+    const rep = (await Reputation.countReputation(chatId, username)) || {plus: 0, minus: 0, value: 0};
     return {
         chatId,
         reputation: {
@@ -46,8 +45,20 @@ async function getReputation(chatId, user, change) {
     };
 }
 
+async function updateReputation(chatId, username, value) {
+    const rep = (await Reputation.countReputation(chatId, username)) 
+        || new Reputation({chatId, username, value: 0, minus: 0, plus: 0});
+    rep.value += value;
+    if (value == 1) {
+        rep.plus++;
+    } else {
+        rep.minus++;
+    }
+    await rep.save();
+}
+
 async function getStats(chatId) {
-    const result = await db.ReputationChange.getStats(chatId, PLUS, MINUS, -1);
+    const result = await db.Reputation.getStats(chatId, -1);
     return {
         chatId,
         type: 'stats',
@@ -98,6 +109,7 @@ async function setReputation(from, chatId, user, value) {
             value,
             time: now
         });
+        await updateReputation(chatId, username, value);
         await rep.save();
         return value;
     }

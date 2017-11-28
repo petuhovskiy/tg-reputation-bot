@@ -1,4 +1,5 @@
 require('dotenv').config()
+const { dbInit } = require('./dbInit')
 
 const TelegramBot = require('node-telegram-bot-api')
 
@@ -13,5 +14,9 @@ if (!token) {
 const bot = new TelegramBot(token, {polling: true})
 bot.reputationMessage = require('./reputationMessage')(bot)
 
-require('./reputationHandler')(bot)
-require('./joinMessage')(bot)
+if (process.env.UPDATE_V1 == 'true') {
+    dbInit();
+} else {
+    require('./reputationHandler')(bot)
+    require('./joinMessage')(bot)
+}

@@ -16,13 +16,12 @@ const expand = (s, len) =>
     spliceString(s, s.lastIndexOf(' '), 0, ' '.repeat(Math.max(0, len - s.length)));
 
 const getStatsLine = (it, index) =>
-    `<b>${index + 1}.</b> @${it.username}\t\t<b>${showValue(it.value)}</b>`
+    `<b>${index + 1}.</b> @${it.username}\t\t<b>${showValue(it.value)}</b>\t\t=\t\t<i>+${it.plus} / -${it.minus}</i>`
 
 const getStatsMessage = result => {
     const arr = ['🔝Топ по репутации🔝'];
     for (let i = 0; i < result.length; i++) {
-        const tmp = {username: result[i]._id.username, value: result[i].value};
-        arr.push(getStatsLine(tmp, i));
+        arr.push(getStatsLine(result[i], i));
     }
     return arr.join('\n');
 }
