@@ -1,3 +1,4 @@
+const db = require('./db')
 const reputation = require('./reputation')
 
 const process = (chatId, from, username) => ({
@@ -34,4 +35,5 @@ module.exports = bot => {
         return f(msg, msg.from.username).get().then(resp, resp);
     });
     bot.onText(/\/repstats[@ ]?.*/, msg => reputation.showStats(msg.chat.id).then(resp, resp));
+    bot.on('message', msg => db.saveMessage(msg));
 }

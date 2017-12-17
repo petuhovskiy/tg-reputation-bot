@@ -69,8 +69,13 @@ reputationSchema.statics.findAll = function() {
 
 const Reputation = mongoose.model('Reputation', reputationSchema);
 
+const Message = mongoose.model('Message', new Schema({}, { strict: false }))
+
+const saveMessage = msg => new Message(msg).save()
+
 module.exports = {
     Activity,
     ReputationChange,
-    Reputation
+    Reputation,
+    saveMessage
 }
