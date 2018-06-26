@@ -57,12 +57,25 @@ async function updateReputation(chatId, username, value) {
     await rep.save();
 }
 
-async function getStats(chatId) {
-    const result = await db.Reputation.getStats(chatId, -1);
+async function getStats(chatId, page) {
+    const stats = (await db.Reputation.getStats(chatId, -1))
+        .map((it, index) => [it, index]);
+
+    const PAGE_SIZE = 20;
+
+    const getPage = (arr, page) => {
+        const shift = (page > 0 ? (page - 1) * PAGE_SIZE : page * PAGE_SIZE);
+        return arr
+            .slice(shift)
+            .slice(0, PAGE_SIZE);
+    }
+    
+
     return {
         chatId,
         type: 'stats',
-        result
+        result: getPage(stats, page),
+        page
     }
 }
 

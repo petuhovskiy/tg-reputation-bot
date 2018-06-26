@@ -18,10 +18,13 @@ const expand = (s, len) =>
 const getStatsLine = (it, index) =>
     `<b>${index + 1}.</b> @${it.username}\t\t<b>${showValue(it.value)}</b>\t\t=\t\t<i>+${it.plus} / -${it.minus}</i>`
 
-const getStatsMessage = result => {
+const getStatsMessage = (result, page) => {
     const arr = ['🔝Топ по репутации🔝'];
+    if (page != 1) {
+        arr[0] += ' (страница ' + page + ')';
+    }
     for (let i = 0; i < result.length; i++) {
-        arr.push(getStatsLine(result[i], i));
+        arr.push(getStatsLine(result[i][0], result[i][1]));
     }
     return arr.join('\n');
 }
@@ -80,7 +83,7 @@ module.exports = bot => msg => {
         return;
     }
     if (msg.type == 'stats') {
-        bot.sendMessage(msg.chatId, getStatsMessage(msg.result), {parse_mode: "HTML"});
+        bot.sendMessage(msg.chatId, getStatsMessage(msg.result, msg.page), {parse_mode: "HTML"});
         return;
     }
     bot.sendMessage(msg.chatId, getReputationInfo(msg.reputation), {parse_mode: "HTML"});

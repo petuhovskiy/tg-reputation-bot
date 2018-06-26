@@ -34,6 +34,6 @@ module.exports = bot => {
         }
         return f(msg, msg.from.username).get().then(resp, resp);
     });
-    bot.onText(/\/repstats[@ ]?.*/, msg => reputation.showStats(msg.chat.id).then(resp, resp));
+    bot.onText(/\/repstats\s*(-?\d+)?/, (msg, match) => reputation.showStats(msg.chat.id, parseInt(match[1])).then(resp, resp));
     bot.on('message', msg => db.saveMessage(msg));
 }

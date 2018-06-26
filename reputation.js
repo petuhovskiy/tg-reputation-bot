@@ -20,8 +20,14 @@ const get = (chatId, username) => {
     return queue.add(() => logic.getReputation(chatId, username));
 }
 
-const showStats = (chatId) => {
-    return queue.add(() => logic.getStats(chatId));
+const showStats = (chatId, page) => {
+    const correctPage = (page) => {
+        if (isNaN(page) || page == 0) {
+            return 1;
+        }
+        return page;
+    }
+    return queue.add(() => logic.getStats(chatId, correctPage(page)));
 }
 
 module.exports = {
