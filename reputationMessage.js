@@ -15,8 +15,13 @@ const showValue = value => {
 const expand = (s, len) =>
     spliceString(s, s.lastIndexOf(' '), 0, ' '.repeat(Math.max(0, len - s.length)));
 
-const getStatsLine = (it, index) =>
-    `<b>${index + 1}.</b> @${it.username}\t\t<b>${showValue(it.value)}</b>\t\t=\t\t<i>+${it.plus} / -${it.minus}</i>`
+const getStatsLine = (it, index) => {
+    let secret = '';
+    if (it.username === 'elena_city') {
+        secret = ' 💎';
+    }
+    return `<b>${index + 1}.</b> @${it.username}${secret}\t\t<b>${showValue(it.value)}</b>\t\t=\t\t<i>+${it.plus} / -${it.minus}</i>`;
+}
 
 const getStatsMessage = (result, page) => {
     const arr = ['🔝Топ по репутации🔝'];
