@@ -93,7 +93,7 @@ async function setReputation(from, chatId, user, value) {
         throw {chatId, limit: 3};
     }
 
-    const rep = await getReputation(chatId, {
+    const actualRep = await getReputation(chatId, {
         username: fromUsername,
         query: from.username,
         display: '@' + from.username
@@ -101,7 +101,7 @@ async function setReputation(from, chatId, user, value) {
 
     const checkActivity = act => {
         const actualPlusLimit = (
-            rep.reputation.value >= 50 ? EXTENDED_PLUS_LIMIT : PLUS_LIMIT
+            actualRep.reputation.value >= 50 ? EXTENDED_PLUS_LIMIT : PLUS_LIMIT
         )
         if (act.plus > actualPlusLimit) throw {chatId, limit: 2};
         if (act.minus > MINUS_LIMIT) throw {chatId, limit: 1};
@@ -114,7 +114,7 @@ async function setReputation(from, chatId, user, value) {
         activity.minus += 1;
         const err = {chatId, limit: 5};
         if (!fromUsername) throw err;
-        if (rep.reputation.value < 5) throw err;
+        if (actualRep.reputation.value < 5) throw err;
     }
 
     const now = Date.now();
