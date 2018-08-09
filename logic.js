@@ -79,6 +79,7 @@ async function getStats(chatId, page) {
     }
 }
 
+const EXTENDED_PLUS_LIMIT = parseInt(process.env.EXTENDED_PLUS_LIMIT || '5')
 const PLUS_LIMIT = parseInt(process.env.PLUS_LIMIT || '3')
 const MINUS_LIMIT = parseInt(process.env.MINUS_LIMIT || '1')
 
@@ -92,8 +93,17 @@ async function setReputation(from, chatId, user, value) {
         throw {chatId, limit: 3};
     }
 
+    const rep = await getReputation(chatId, {
+        username: fromUsername,
+        query: from.username,
+        display: '@' + from.username
+    });
+
     const checkActivity = act => {
-        if (act.plus > PLUS_LIMIT) throw {chatId, limit: 2};
+        const actualPlusLimit = (
+            rep.reputation.value >= 50 ? EXTENDED_PLUS_LIMIT : PLUS_LIMIT
+        )
+        if (act.plus > actualPlusLimit) throw {chatId, limit: 2};
         if (act.minus > MINUS_LIMIT) throw {chatId, limit: 1};
     }
 
@@ -104,11 +114,6 @@ async function setReputation(from, chatId, user, value) {
         activity.minus += 1;
         const err = {chatId, limit: 5};
         if (!fromUsername) throw err;
-        const rep = await getReputation(chatId, {
-            username: fromUsername,
-            query: from.username,
-            display: '@' + from.username
-        });
         if (rep.reputation.value < 5) throw err;
     }
 
