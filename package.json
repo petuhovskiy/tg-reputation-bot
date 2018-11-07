@@ -19,9 +19,9 @@
   "homepage": "https://github.com/petuhovskiy/tg-reputation-bot#readme",
   "dependencies": {
     "dotenv": "^4.0.0",
-    "mongodb": "^2.2.33",
-    "mongoose": "^4.13.5",
-    "node-telegram-bot-api": "^0.29.0",
+    "mongodb": "^2.2.36",
+    "mongoose": "^4.13.17",
+    "node-telegram-bot-api": "^0.30.0",
     "splice-string": "^2.0.0"
   }
 }

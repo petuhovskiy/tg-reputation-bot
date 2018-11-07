@@ -1,22 +1,12 @@
-require('dotenv').config()
-const { dbInit } = require('./dbInit')
+require("dotenv").config()
 
-const TelegramBot = require('node-telegram-bot-api')
+const bot = require("./bot")
 
-const token = process.env.BOT_TOKEN;
+require("./handler")(bot)
+require("./front/join")(bot)
+require("./admin/handler")(bot)
 
-if (!token) {
-    console.error('token is required!')
-    process.exit(1)
-}
-
-// init
-const bot = new TelegramBot(token, {polling: true})
-bot.reputationMessage = require('./reputationMessage')(bot)
-
-if (process.env.UPDATE_V1 == 'true') {
-    dbInit();
-} else {
-    require('./reputationHandler')(bot)
-    require('./joinMessage')(bot)
-}
+bot.on("polling_error", error => {
+    console.log(error)
+    console.log(error.code) // => 'EFATAL'
+})
