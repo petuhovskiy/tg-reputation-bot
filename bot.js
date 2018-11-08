@@ -8,6 +8,9 @@ if (!token) {
 
 // init
 const bot = new TelegramBot(token, { polling: true })
-console.log("bot")
+
+bot.sendHTML = (id, html) => {
+    return bot.sendMessage(id, html, { parse_mode: "HTML" })
+}
 
 module.exports = bot

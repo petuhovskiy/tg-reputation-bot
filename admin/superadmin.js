@@ -2,6 +2,7 @@ const db = require("../db")
 const bot = require("../bot")
 const utils = require("../lib/utils")
 const queue = require("../back/queue")
+const inv = require('./invalidate')
 const { revealLast10 } = require('./manage')
 
 const handleCommand = (msg, cmd, action) => {
@@ -20,6 +21,7 @@ const superhelp = (text, msg) => {
             /superhelp - display this
             /showallchats - show all chats info
             /invalidate - do something
+            /reveal {chatid}
         `),
         {
             parse_mode: "HTML",
@@ -48,49 +50,7 @@ Messages count: ${await db.Message.count({ "chat.id": chat.id })}
 
 const invalidate = (text, msg) => {
     queue.add(async () => {
-        bot.sendMessage(msg.chat.id, "Invalidation started")
-
-        const remall = await db.Reputation.deleteMany({})
-        bot.sendMessage(
-            msg.chat.id,
-            `<code>${JSON.stringify(remall, null, 4)}</code>`,
-            {
-                parse_mode: "HTML",
-            }
-        )
-
-        const all = await db.ReputationChange.findAll()
-        bot.sendMessage(msg.chat.id, "All fetched")
-
-        const users = {}
-        for (let i = 0; i < all.length; ++i) {
-            const obj = all[i]
-            const { username, chatId, value } = obj
-            const token = username + "$" + chatId
-            if (!users[token]) {
-                users[token] = {
-                    chatId,
-                    username,
-                    value: 0,
-                    plus: 0,
-                    minus: 0,
-                }
-            }
-            const user = users[token]
-            if (value == 1) {
-                user.value++
-                user.plus++
-            } else if (value == -1) {
-                user.value--
-                user.minus++
-            }
-        }
-        bot.sendMessage(msg.chat.id, "All calculated, storing in db")
-        for (const token in users) {
-            await new db.Reputation(users[token]).save()
-        }
-
-        bot.sendMessage(msg.chat.id, "Invalidation finished")
+        await inv(msg.chat.id)
     })
 }
 

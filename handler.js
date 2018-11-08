@@ -1,5 +1,6 @@
 const db = require("./db")
 const reputation = require("./back/reputation")
+const msgs = require("./front/msg")
 
 const methods = (chatId, from, username) => ({
     plus: () => reputation.plus(chatId, from, username),
@@ -40,10 +41,7 @@ module.exports = bot => {
     )
     bot.onText(/\?rep$/, msg => {
         if (!msg.from.username) {
-            bot.sendMessage(
-                "Вам нужно <b>поставить username</b> для того чтобы узнавать свою репутацию ⛔️!",
-                { parse_mode: "HTML" }
-            )
+            bot.sendHTML(msg.chat.id, msgs.errorRequiredUsername())
             return
         }
         return f(msg, msg.from.username)
@@ -53,5 +51,6 @@ module.exports = bot => {
     bot.onText(/\/repstats\s*(-?\d+)?/, (msg, match) =>
         reputation.showStats(msg.chat.id, parseInt(match[1])).then(resp, resp)
     )
+    bot.onText(/\/rephelp/, msg => bot.sendHTML(msg.chat.id, msgs.helpBot()))
     bot.on("message", msg => db.saveMessage(msg))
 }
