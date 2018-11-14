@@ -137,6 +137,48 @@ const migrate = (text, msg) => {
     })
 }
 
+const welcome = (text, msg) => {
+    let message
+    try {
+        const reg = /\/welcome ([\s\S]+)/
+        const result = reg.exec(text)
+        if (!result) {
+            bot.sendHTML(msg.chat.id, msgs.adminNotParsed())
+            return
+        }
+        message = result[1]
+    } catch (err) {
+        bot.sendHTML(msg.chat.id, msgs.adminErrorCaught())
+        console.log(err)
+        return
+    }
+
+    const chatId = chatAdmins[msg.chat.id]
+    if (!chatId) {
+        bot.sendHTML(msg.chat.id, msgs.adminStatusNoChat())
+        return
+    }
+
+    message = message.trim()
+    if (message === "" || !message) {
+        db.Welcome.remove({
+            chatId,
+        })
+        bot.sendHTML(msg.chat.id, msgs.adminWelcomeRemoved())
+        return
+    }
+
+    db.Welcome.update({
+        chatId,
+    }, new db.Welcome({
+        chatId,
+        message,
+    }), {
+        upsert: true,
+    })
+    bot.sendHTML(msg.chat.id, msgs.adminWelcomeInstalled())
+}
+
 const handle = msg => {
     if (msg.chat.type !== "private") {
         handleCommand(msg, "/admin", enableadmin)
@@ -149,6 +191,7 @@ const handle = msg => {
     handleCommand(msg, "/cancel", cancel)
     handleCommand(msg, "/get", get)
     handleCommand(msg, "/migrate", migrate)
+    handleCommand(msg, "/welcome", welcome)
 }
 
 module.exports = handle

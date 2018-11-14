@@ -11,6 +11,7 @@ const ReputationChange = mongoose.model(
     require("./reputationChange")
 )
 const Reputation = mongoose.model("Reputation", require("./reputation"))
+const Welcome = mongoose.model("Welcome", require("./welcome"))
 const Message = mongoose.model("Message", new Schema({}, { strict: false }))
 const saveMessage = msg => new Message(msg).save()
 const RepEvent = mongoose.model("RepEvent", new Schema({}, { strict: false }))
@@ -20,6 +21,7 @@ module.exports = {
     Activity,
     ReputationChange,
     Reputation,
+    Welcome,
     Message,
     saveMessage,
     RepEvent,
