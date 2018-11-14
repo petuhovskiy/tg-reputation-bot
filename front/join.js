@@ -13,7 +13,6 @@ module.exports = bot => {
             } else {
                 (async () => {
                     const welcome = await db.Welcome.findOne({chatId})
-                    console.log(welcome)
                     if (welcome) {
                         bot.sendHTML(chatId, welcome.message)
                     }

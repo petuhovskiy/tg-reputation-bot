@@ -140,7 +140,7 @@ const migrate = (text, msg) => {
 const welcome = (text, msg) => {
     let message
     try {
-        const reg = /\/welcome ([\s\S]+)/
+        const reg = /\/welcome([\s\S]*)/
         const result = reg.exec(text)
         if (!result) {
             bot.sendHTML(msg.chat.id, msgs.adminNotParsed())
@@ -168,15 +168,18 @@ const welcome = (text, msg) => {
         return
     }
 
-    db.Welcome.update({
-        chatId,
-    }, new db.Welcome({
-        chatId,
-        message,
-    }), {
-        upsert: true,
-    })
-    bot.sendHTML(msg.chat.id, msgs.adminWelcomeInstalled())
+    (async () => {
+        const x = await db.Welcome.updateOne({
+            chatId,
+        }, {
+            chatId,
+            message,
+        }, {
+            upsert: true,
+        })
+        console.log(x);
+        await bot.sendHTML(msg.chat.id, msgs.adminWelcomeInstalled())
+    })()
 }
 
 const handle = msg => {
