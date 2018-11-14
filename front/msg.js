@@ -70,16 +70,14 @@ const msg = {
             Уменьшить репутацию можно не более одного раза в день.
             Для уменьшения репутации нужно иметь репутацию >= 5.`
         ),
-    showRepChange: (rep) => `Изменение от <a href="tg://user?id=${
+    showRepChange: rep => `Изменение от <a href="tg://user?id=${
         rep.id
     }">юзера</a>:
 Репутация @${rep.username} ${msg.getForChange(rep.value)}`,
     adminCanceled: (adm, rep) =>
         trim(
             `
-            <a href="tg://user?id=${
-                adm
-            }">Админ</a> отменил изменение репутации:
+            <a href="tg://user?id=${adm}">Админ</a> отменил изменение репутации:
             
             ${msg.showRepChange(rep)}
             `
@@ -94,14 +92,26 @@ const msg = {
             /adminstatus - текущий статус
             /latest - последние 10 репутаций
             /cancel - отменить изменение репутации
+            /get - узнать текущую репутацию
+            
 
-            Использование:
+            Пользование отменой:
 
             Написать /latest чтобы получить последние репутации.
             Скопировать ID нужной, который имеет вид 5b3df53ab52f390019a2bc17.
             После этого ее можно отменить командой:
             
             /cancel 5b3df53ab52f390019a2bc17
+
+            
+            Пользование миграцией:
+
+            Проверить с помощью /get правильность репутаций.
+            После вызвать /migrate.
+
+            /get @old
+            /get @new
+            /migrate @old @new
         `
         ),
     adminStatusNoChat: () => `Текущий статус: чат не выбран.`,
@@ -109,5 +119,9 @@ const msg = {
     adminNotParsed: () => "Ошибка в команде!",
     adminErrorCaught: () => "Ошибка в команде.",
     adminNotFound: () => `Не найдено`,
+    adminNotFoundUsername: username => `Не можем найти @${username}`,
+    adminDone: () => `Готово!`,
+    adminDoneMigration: (admin, cnt, old, nw) =>
+        `<a href="tg://user?id=${admin}">Админ</a> перенес репутацию с @${old} на @${nw}. Обновлено ${cnt} записей.`,
 }
 module.exports = msg

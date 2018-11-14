@@ -2,9 +2,9 @@ const db = require("../db")
 const bot = require("../bot")
 const utils = require("../lib/utils")
 const queue = require("../back/queue")
-const inv = require('./invalidate')
-const { revealLast10 } = require('./manage')
-const msgs = require('../front/msg')
+const inv = require("./invalidate")
+const { revealLast10, showRep, cancelRep, migrateRep } = require("./manage")
+const msgs = require("../front/msg")
 
 const chatAdmins = {}
 
@@ -16,14 +16,13 @@ const handleCommand = (msg, cmd, action) => {
 }
 
 const enableadmin = async (text, msg) => {
-    console.log(JSON.stringify(msg, null, 4))
     const member = await bot.getChatMember(msg.chat.id, msg.from.id)
-    console.log(JSON.stringify(member, null, 4))
     if (member.status !== "administrator" && member.status !== "creator") {
         bot.sendMessage(msg.chat.id, msgs.adminOnly())
         return
     }
     chatAdmins[msg.from.id] = msg.chat.id
+    bot.sendHTML(msg.from.id, msgs.helpAdmin())
     showStatus(msg.from.id)
     showLatest(msg.from.id)
 }
@@ -81,24 +80,60 @@ const cancel = (text, msg) => {
             return
         }
 
-        const rep = await db.ReputationChange.findOne({
-            _id: repId,
-            chatId,
-        })
+        await cancelRep(repId, chatId, msg.chat.id)
+    })
+}
 
-        if (!rep) {
-            bot.sendMessage(msg.chat.id, msgs.adminNotFound())
+const get = (text, msg) => {
+    const chatId = chatAdmins[msg.chat.id]
+    if (!chatId) {
+        bot.sendHTML(id, msgs.adminStatusNoChat())
+        return
+    }
+
+    let username
+    try {
+        const reg = /\/get ([@\w]+)/
+        const result = reg.exec(text)
+        if (!result) {
+            bot.sendHTML(msg.chat.id, msgs.adminNotParsed())
+            return
+        }
+        username = result[1]
+    } catch (err) {
+        bot.sendHTML(msg.chat.id, msgs.adminErrorCaught())
+        console.log(err)
+        return
+    }
+
+    showRep(username, chatId, msg.chat.id)
+}
+
+const migrate = (text, msg) => {
+    let username1, username2
+    try {
+        const reg = /\/migrate ([@\w]+) ([@\w]+)/
+        const result = reg.exec(text)
+        if (!result) {
+            bot.sendHTML(msg.chat.id, msgs.adminNotParsed())
+            return
+        }
+        username1 = result[1]
+        username2 = result[2]
+    } catch (err) {
+        bot.sendHTML(msg.chat.id, msgs.adminErrorCaught())
+        console.log(err)
+        return
+    }
+
+    queue.add(async () => {
+        const chatId = chatAdmins[msg.chat.id]
+        if (!chatId) {
+            bot.sendHTML(id, msgs.adminStatusNoChat())
             return
         }
 
-        await db.ReputationChange.remove({
-            _id: repId,
-            chatId,
-        })
-
-        bot.sendHTML(chatId, msgs.adminCanceled(msg.chat.id, rep))
-        
-        await inv()
+        await migrateRep(username1, username2, chatId, msg.chat.id)
     })
 }
 
@@ -112,6 +147,8 @@ const handle = msg => {
     handleCommand(msg, "/adminstatus", adminstatus)
     handleCommand(msg, "/latest", latest)
     handleCommand(msg, "/cancel", cancel)
+    handleCommand(msg, "/get", get)
+    handleCommand(msg, "/migrate", migrate)
 }
 
 module.exports = handle

@@ -13,6 +13,8 @@ const ReputationChange = mongoose.model(
 const Reputation = mongoose.model("Reputation", require("./reputation"))
 const Message = mongoose.model("Message", new Schema({}, { strict: false }))
 const saveMessage = msg => new Message(msg).save()
+const RepEvent = mongoose.model("RepEvent", new Schema({}, { strict: false }))
+const saveEvent = ev => new RepEvent(ev).save()
 
 module.exports = {
     Activity,
@@ -20,4 +22,6 @@ module.exports = {
     Reputation,
     Message,
     saveMessage,
+    RepEvent,
+    saveEvent,
 }

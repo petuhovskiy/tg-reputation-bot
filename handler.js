@@ -1,3 +1,4 @@
+const parseUsername = require("./front/parseUsename")
 const db = require("./db")
 const reputation = require("./back/reputation")
 const msgs = require("./front/msg")
@@ -10,15 +11,6 @@ const methods = (chatId, from, username) => ({
 
 const f = (msg, username) => {
     return methods(msg.chat.id, msg.from, parseUsername(username))
-}
-
-const parseUsername = u => {
-    let username = u.indexOf("@") == 0 ? u.substring(1) : u
-    return {
-        username: username.toLowerCase(),
-        query: username,
-        display: "@" + username,
-    }
 }
 
 module.exports = bot => {
