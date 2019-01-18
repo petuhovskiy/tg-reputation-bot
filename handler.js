@@ -21,10 +21,16 @@ module.exports = bot => {
             .plus()
             .then(resp, resp)
     )
-    bot.onText(/-rep ([@\w]+)/, (msg, match) =>
-        f(msg, match[1])
-            .minus()
-            .then(resp, resp)
+    bot.onText(/-rep ([@\w]+)/, async (msg, match) => {
+            const member = await bot.getChatMember(msg.chat.id, msg.from.id)
+            if (member.status !== "administrator" && member.status !== "creator") {
+                bot.sendMessage(msg.chat.id, msgs.adminOnly())
+                return
+            }
+            f(msg, match[1])
+                .minus()
+                .then(resp, resp)
+        }
     )
     bot.onText(/\?rep ([@\w]+)/, (msg, match) =>
         f(msg, match[1])

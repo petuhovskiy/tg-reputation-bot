@@ -103,8 +103,10 @@ async function setReputation(from, chatId, user, value) {
     })
 
     const checkActivity = act => {
-        const actualPlusLimit =
-            actualRep.reputation.value >= 50 ? EXTENDED_PLUS_LIMIT : PLUS_LIMIT
+        const actualPlusLimit = Math.min(
+            10,
+            3 + Math.max(0, actualRep.reputation.value / 50)
+        )
         if (act.plus > actualPlusLimit) throw { chatId, limit: 2 }
         if (act.minus > MINUS_LIMIT) throw { chatId, limit: 1 }
     }
