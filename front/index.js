@@ -40,9 +40,7 @@ module.exports = bot => msg => {
         return
     }
     if (msg.type == "stats") {
-        utils.deleteLater(
-            bot.sendHTML(msg.chatId, msgs.getStatsMessage(msg.result, msg.page))
-        )
+        bot.sendHTML(msg.chatId, msgs.getStatsMessage(msg.result, msg.page))
         return
     }
     utils.deleteLater(
